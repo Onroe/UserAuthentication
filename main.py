@@ -22,36 +22,37 @@ mysql = MySQL(app)
 @app.route('/Login/', methods=['GET', 'POST'])
 def login():
     #return render_template('index.html', msg='')
-	# Output message if something goes wrong...
+    # Output message if something goes wrong...
     msg = ''
     # Check if "username" and "password" POST requests exist (user submitted form)
     if request.method == 'POST' and 'username' in request.form and 'password' in request.form:
         # Create variables for easy access
         username = request.form['username']
         password = request.form['password']
-		
-		# Check if account exists using MySQL
+        
+        # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         cursor.execute('SELECT * FROM accounts WHERE username = %s AND password = %s', (username, password))
         # Fetch one record and return result
         account = cursor.fetchone()
-		
-		 # If account exists in accounts table in out database
+        
+         # If account exists in accounts table in out database
         if account:
             # Create session data, we can access this data in other routes
             session['loggedin'] = True
             session['id'] = account['id']
             session['username'] = account['username']
             # Redirect to home page
-            return 'Logged in successfully!'
-			#return redirect(url_for('login'))
+            #return 'Logged in successfully!'
+            return redirect(url_for('home'))
+            
         else:
             # Account doesnt exist or username/password incorrect
             msg = 'Incorrect username/password!'
-			
-		# Show the login form with message (if any)
+            
+        # Show the login form with message (if any)
     return render_template('index.html', msg=msg)
-	
+    
 
 #http://localhost:5000/Login/logout - this will be the logout page
 @app.route('/Login/logout')
@@ -76,10 +77,10 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
-		
-	  # Check if account exists using MySQL
+        
+      # Check if account exists using MySQL
         cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
-        cursor.execute('SELECT * FROM accounts WHERE username = %s', (username))
+        cursor.execute('SELECT * FROM accounts WHERE username = %s', [username])
         account = cursor.fetchone()
         # If account exists show error and validation checks
         if account:
@@ -100,7 +101,7 @@ def register():
         msg = 'Please fill out the form!'
     # Show registration form with message (if any)
     return render_template('register.html', msg=msg)
-	
+    
 # http://localhost:5000/Login/home - Home page
 @app.route('/Login/home')
 def home():
@@ -110,10 +111,10 @@ def home():
         return render_template('home.html', username=session['username'])
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
-	
-	
+    
+    
 # http://localhost:5000/Login/profile - Profile page
-@app.route('/pythonlogin/profile')
+@app.route('/Login/profile')
 def profile():
     # Check if user is loggedin
     if 'loggedin' in session:
@@ -125,6 +126,6 @@ def profile():
         return render_template('profile.html', account=account)
     # User is not loggedin redirect to login page
     return redirect(url_for('login'))
-	
+    
 if __name__ == "__main__":
-    app.run(debug=True)	
+    app.run(debug=True) 
