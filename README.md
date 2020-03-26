@@ -1,2 +1,2 @@
 # UserAuthentication
-Flask User Authentication Module
+Flask MySQL User Authentication Module
